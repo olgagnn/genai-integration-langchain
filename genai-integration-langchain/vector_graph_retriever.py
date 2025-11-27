@@ -7,8 +7,9 @@ from langchain.chat_models import init_chat_model
 from langgraph.graph import START, StateGraph
 from langchain_core.prompts import PromptTemplate
 from typing_extensions import List, TypedDict
+from langchain_neo4j import Neo4jGraph
+from langchain_neo4j import Neo4jVector
 from langchain_openai import OpenAIEmbeddings
-from langchain_neo4j import Neo4jGraph, Neo4jVector
 
 # Initialize the LLM
 model = init_chat_model("gpt-4o", model_provider="openai")
@@ -38,13 +39,9 @@ graph = Neo4jGraph(
     password=os.getenv("NEO4J_PASSWORD"),
     database=os.getenv("NEO4J_DATABASE"),
 )
-# end::graph[]
 
 # Create the embedding model
 embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
-
-# Define the retrieval query
-# retrieval_query =
 
 # Create Vector
 plot_vector = Neo4jVector.from_existing_index(
@@ -62,7 +59,7 @@ def retrieve(state: State):
     # Use the vector to find relevant documents
     context = plot_vector.similarity_search(
         state["question"],
-        k=6,
+        k=6
     )
     return {"context": context}
 
@@ -78,8 +75,6 @@ workflow.add_edge(START, "retrieve")
 app = workflow.compile()
 
 # Run the application
-question = "Who acts in movies about Love and Romance?"
+question = "What is the movie with the pig who wants to be a sheep dog?"
 response = app.invoke({"question": question})
 print("Answer:", response["answer"])
-print("Context:", response["context"])
-
