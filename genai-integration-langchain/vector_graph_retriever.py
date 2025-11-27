@@ -78,3 +78,4 @@ app = workflow.compile()
 question = "What is the movie with the pig who wants to be a sheep dog?"
 response = app.invoke({"question": question})
 print("Answer:", response["answer"])
+print("Context:", response["context"])
