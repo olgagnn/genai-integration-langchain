@@ -28,5 +28,9 @@ plot_vector = Neo4jVector.from_existing_index(
 
 # Search for similar movie plots
 plot = "Toys come alive"
-result = plot_vector.similarity_search(plot, k=3)
+result = plot_vector.similarity_search(
+    plot,
+    k=3,
+    filter={"revenue": {"$gte": 200000000}}
+)
 print(result)
