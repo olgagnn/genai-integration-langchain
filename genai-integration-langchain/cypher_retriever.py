@@ -8,6 +8,7 @@ from langgraph.graph import START, StateGraph
 from langchain_core.prompts import PromptTemplate
 from typing_extensions import List, TypedDict
 from langchain_neo4j import Neo4jGraph
+from langchain_neo4j import GraphCypherQAChain
 
 # Initialize the LLM
 model = init_chat_model("gpt-4o", model_provider="openai")
@@ -39,15 +40,20 @@ graph = Neo4jGraph(
 )
 
 # Create the Cypher QA chain
-# cypher_qa =
+cypher_qa = GraphCypherQAChain.from_llm(
+    graph=graph,
+    llm=model,
+    allow_dangerous_requests=True,
+    return_direct=True,
+)
 
 # Define functions for each step in the application
 
 # Retrieve context
 def retrieve(state: State):
-    context = [
-        {"data": "None"}
-    ]
+    context = cypher_qa.invoke(
+        {"query": state["question"]}
+    )
     return {"context": context}
 
 # Generate the answer based on the question and context
@@ -66,5 +72,3 @@ question = "What movies has Tom Hanks acted in?"
 response = app.invoke({"question": question})
 print("Answer:", response["answer"])
 print("Context:", response["context"])
-
-
